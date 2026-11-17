@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resumo IA</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  textarea, select, button { width: 100%; font: inherit; padding: .6rem; margin: .4rem 0; }
+  button { cursor: pointer; }
+  pre { white-space: pre-wrap; background: #f4f4f4; padding: 1rem; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>Resumo IA</h1>
+<p>Cole um texto longo e receba um resumo, tópicos ou tarefas. Usa uma API de IA (OpenAI ou Claude) quando há chave configurada.</p>
+<textarea id="texto" rows="10" placeholder="Cole o texto aqui..."></textarea>
+<select id="estilo">
+  <option value="curto">Resumo curto</option>
+  <option value="topicos">Em tópicos</option>
+  <option value="tarefas">Resumo + tarefas</option>
+</select>
+<button id="btn">Resumir</button>
+<p id="status"></p>
+<pre id="saida" hidden></pre>
+<script>
+document.getElementById('btn').onclick = async () => {
+  const texto = document.getElementById('texto').value;
+  const estilo = document.getElementById('estilo').value;
+  const status = document.getElementById('status');
+  const saida = document.getElementById('saida');
+  status.textContent = 'Resumindo...';
+  saida.hidden = true;
+  const r = await fetch('/api/resumir', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texto, estilo }),
+  });
+  const dados = await r.json();
+  if (dados.erro) { status.textContent = dados.erro; return; }
+  status.textContent = 'Provedor: ' + dados.provedor;
+  saida.textContent = dados.resumo;
+  saida.hidden = false;
+};
+</script>
+</body>
+</html>
